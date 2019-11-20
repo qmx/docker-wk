@@ -32,7 +32,7 @@ RUN apt-get update && apt-get install \
 	-y
 RUN curl -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain 1.38.0
 ENV CARGO_INSTALL_ROOT /opt/rust-tools
-RUN . /root/.cargo/env && rustc -V && git clone https://github.com/rust-analyzer/rust-analyzer.git /tmp/rust-analyzer && cd /tmp/rust-analyzer && cargo install-ra --server
+RUN . /root/.cargo/env && rustc -V && git clone https://github.com/rust-analyzer/rust-analyzer.git /tmp/rust-analyzer && cd /tmp/rust-analyzer && cargo xtask install --server
 
 # rust tools
 FROM debian_base as rust_builder
