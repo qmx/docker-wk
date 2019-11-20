@@ -19,20 +19,7 @@ RUN vim +":set nomore" +GoInstallBinaries +qall
 FROM debian:sid@$DEBIAN_SID_HASH as debian_base
 
 # rust-analyzer
-FROM debian_base as ra_builder
-RUN apt-get update && apt-get install \
-	build-essential \
-	ca-certificates \
-	curl \
-	git \
-	liblzma-dev \
-	libssl-dev \
-	pkg-config \
-	zlib1g-dev \
-	-y
-RUN curl -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain 1.38.0
-ENV CARGO_INSTALL_ROOT /opt/rust-tools
-RUN . /root/.cargo/env && rustc -V && git clone https://github.com/rust-analyzer/rust-analyzer.git /tmp/rust-analyzer && cd /tmp/rust-analyzer && cargo xtask install --server
+FROM qmxme/rust-analyzer:392e745 as ra_builder
 
 # rust tools
 FROM debian_base as rust_builder
