@@ -3,17 +3,7 @@ ARG DEBIAN_SID_HASH=sha256:fc6ae865d58728644a7242375b777a03c8933600c0aff9df491e7
 ARG SSH_HOST_KEYS_HASH=sha256:9a6630c2fbed11a3f806c5a5c1fe1550b628311d8701680fd740cae94b377e6c
 
 ## golang tools
-FROM golang:1.13.1 as golang_builder
-RUN go get github.com/genuinetools/reg
-RUN go get github.com/golang/dep/cmd/dep
-RUN GO111MODULE=on go get github.com/sachaos/todoist@v0.14.0
-RUN GO111MODULE=on go get github.com/screwdriver-cd/gitversion@v1.1.3
-
-# vim-go dependencies
-FROM golang:1.13.1 as vimgo_deps
-RUN apt-get update -q && apt-get install -y -qq vim-nox
-RUN git clone https://github.com/fatih/vim-go.git /root/.vim/pack/lang/start/vim-go
-RUN vim +":set nomore" +GoInstallBinaries +qall
+FROM qmxme/golang-tools:0.0.1 as golang_builder
 
 # define default base debian image
 FROM debian:sid@$DEBIAN_SID_HASH as debian_base
@@ -227,9 +217,6 @@ COPY --from=ra_builder /opt/rust-tools/bin/* /usr/local/bin/
 
 # golang tools
 COPY --from=golang_builder /go/bin/* /usr/local/bin/
-
-# vim-go tools
-COPY --from=vimgo_deps /go/bin/* /usr/local/bin/
 
 # terraform
 COPY --from=terraform_builder /usr/local/bin/terraform /usr/local/bin/
