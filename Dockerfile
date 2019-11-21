@@ -145,6 +145,7 @@ RUN apt-get update -qq && apt-get upgrade -y && apt-get install -qq -y \
 	unzip \
 	vim-nox \
 	wabt \
+	wireguard-tools \
 	zgen \
 	zip \
 	zlib1g-dev \
