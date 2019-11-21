@@ -19,7 +19,7 @@ FROM qmxme/rust-web-tools:0.0.1 as rust_web_builder
 
 # install terraform
 FROM qmxme/curl as terraform_builder
-RUN curl -L -o /tmp/terraform.zip https://releases.hashicorp.com/terraform/0.12.9/terraform_0.12.9_linux_amd64.zip
+RUN curl -L -o /tmp/terraform.zip https://releases.hashicorp.com/terraform/0.12.16/terraform_0.12.16_linux_amd64.zip
 RUN cd /usr/local/bin && unzip /tmp/terraform.zip && chmod 755 /usr/local/bin/terraform
 
 # install kubectl
