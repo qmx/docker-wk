@@ -80,7 +80,6 @@ RUN chmod 755 /usr/local/bin/coursier
 # SSH host keys
 FROM qmxme/openssh@$SSH_HOST_KEYS_HASH as ssh_host_keys
 
-
 # base distro
 FROM debian_base
 
@@ -99,6 +98,7 @@ RUN apt-get update -qq && apt-get upgrade -y && apt-get install -qq -y \
 	apache2-utils \
 	apt-transport-https \
 	awscli \
+	bat \
 	build-essential \
 	ca-certificates \
 	cargo \
@@ -114,6 +114,7 @@ RUN apt-get update -qq && apt-get upgrade -y && apt-get install -qq -y \
 	entr \
 	exuberant-ctags \
 	fakeroot-ng \
+	fd-find \
 	flake8 \
 	fzf \
 	gdb \
