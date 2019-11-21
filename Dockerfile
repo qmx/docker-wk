@@ -12,42 +12,10 @@ FROM debian:sid@$DEBIAN_SID_HASH as debian_base
 FROM qmxme/rust-analyzer:392e745 as ra_builder
 
 # rust tools
-FROM debian_base as rust_builder
-RUN apt-get update && apt-get install \
-	build-essential \
-	ca-certificates \
-	cargo \
-	cmake \
-	default-libmysqlclient-dev \
-	libclang-dev \
-	liblzma-dev \
-	libpq-dev \
-	libsqlite3-dev \
-	libssl-dev \
-	pkg-config \
-	rustc \
-	rust-src \
-	zlib1g-dev \
-	-y
-RUN cargo install --root /opt/rust-tools bat
-RUN cargo install --root /opt/rust-tools cargo-bloat
-RUN cargo install --root /opt/rust-tools cargo-bump
-RUN cargo install --root /opt/rust-tools cargo-bundle
-RUN cargo install --root /opt/rust-tools cargo-deb
-RUN cargo install --root /opt/rust-tools cargo-debstatus
-RUN cargo install --root /opt/rust-tools cargo-edit
-RUN cargo install --root /opt/rust-tools cargo-expand
-RUN cargo install --root /opt/rust-tools cargo-generate
-RUN cargo install --root /opt/rust-tools cargo-license
-RUN cargo install --root /opt/rust-tools cargo-release
-RUN cargo install --root /opt/rust-tools cargo-tree
-RUN cargo install --root /opt/rust-tools cargo-watch
-RUN cargo install --root /opt/rust-tools cargo-web
-RUN cargo install --root /opt/rust-tools diesel_cli
-RUN cargo install --root /opt/rust-tools perf-focus
-RUN cargo install --root /opt/rust-tools sccache
-RUN cargo install --root /opt/rust-tools systemfd
-RUN cargo install --root /opt/rust-tools wasm-pack
+FROM qmxme/rust-tools:0.0.2 as rust_builder
+
+# rust web tools
+FROM qmxme/rust-web-tools:0.0.1 as rust_web_builder
 
 # install terraform
 FROM qmxme/curl as terraform_builder
@@ -214,6 +182,7 @@ RUN curl -L -o /tmp/cargo-docserver_0.1.2_amd64.deb https://github.com/qmx/cargo
 
 # rust essential crates
 COPY --from=rust_builder /opt/rust-tools/bin/* /usr/local/bin/
+COPY --from=rust_web_builder /opt/rust-tools/bin/* /usr/local/bin/
 COPY --from=ra_builder /opt/rust-tools/bin/* /usr/local/bin/
 
 # golang tools
