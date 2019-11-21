@@ -180,6 +180,9 @@ RUN curl -L -o /tmp/jump_0.22.0_amd64.deb https://github.com/gsamokovarov/jump/r
 RUN curl -L -o /tmp/wk_0.4.0_amd64.deb https://github.com/qmx/wk/releases/download/0.4.0/wk_0.4.0_amd64.deb && dpkg -i /tmp/wk_0.4.0_amd64.deb && rm /tmp/*.deb
 RUN curl -L -o /tmp/cargo-docserver_0.1.2_amd64.deb https://github.com/qmx/cargo-docserver/releases/download/0.1.2/cargo-docserver_0.1.2_amd64.deb && dpkg -i /tmp/cargo-docserver_0.1.2_amd64.deb && rm /tmp/*.deb
 
+# install dive
+RUN curl -L -o /tmp/dive.deb https://github.com/wagoodman/dive/releases/download/v0.9.1/dive_0.9.1_linux_amd64.deb && dpkg -i /tmp/dive.deb && rm /tmp/*.deb
+
 # rust essential crates
 COPY --from=rust_builder /opt/rust-tools/bin/* /usr/local/bin/
 COPY --from=rust_web_builder /opt/rust-tools/bin/* /usr/local/bin/
