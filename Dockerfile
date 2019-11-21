@@ -29,11 +29,10 @@ RUN chmod 755 /usr/local/bin/kubectl
 
 # install helm
 FROM qmxme/curl as helm_builder
-RUN curl -L -o /tmp/helm.tar.gz https://storage.googleapis.com/kubernetes-helm/helm-v2.14.3-linux-amd64.tar.gz
+RUN curl -L -o /tmp/helm.tar.gz https://get.helm.sh/helm-v3.0.0-linux-amd64.tar.gz
 WORKDIR /tmp
 RUN tar -zxvf helm.tar.gz
 RUN cp linux-amd64/helm /usr/local/bin
-RUN cp linux-amd64/tiller /usr/local/bin
 
 # install docker-compose
 FROM qmxme/curl as compose_builder
@@ -198,7 +197,7 @@ COPY --from=terraform_builder /usr/local/bin/terraform /usr/local/bin/
 COPY --from=kubectl_builder /usr/local/bin/kubectl /usr/local/bin/
 
 # helm
-COPY --from=helm_builder /usr/local/bin/helm /usr/local/bin/tiller /usr/local/bin/
+COPY --from=helm_builder /usr/local/bin/helm /usr/local/bin/
 
 # docker-compose
 COPY --from=compose_builder /usr/local/bin/docker-compose /usr/local/bin/
