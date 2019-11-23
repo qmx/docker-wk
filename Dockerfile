@@ -44,7 +44,7 @@ RUN chmod 755 /usr/local/bin/docker-compose
 
 # install coursier
 FROM qmxme/curl as coursier_builder
-RUN curl -L -o /usr/local/bin/coursier https://github.com/coursier/coursier/releases/download/v1.1.0-M9/coursier
+RUN curl -L -o /usr/local/bin/coursier https://github.com/coursier/coursier/releases/download/v2.0.0-RC5-2/coursier
 RUN chmod 755 /usr/local/bin/coursier
 
 # SSH host keys
