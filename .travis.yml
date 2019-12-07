@@ -1,5 +1,5 @@
 language: minimal
-sudo: required
+if: tag IS present
 services:
 - docker
 before_script:
