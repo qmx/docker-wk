@@ -9,7 +9,7 @@ FROM qmxme/golang-tools:0.0.1 as golang_builder
 FROM debian:sid@$DEBIAN_SID_HASH as debian_base
 
 # rust-analyzer
-FROM qmxme/rust-analyzer:392e745 as ra_builder
+FROM qmxme/rust-analyzer:0.0.2 as ra_builder
 
 # rust tools
 FROM qmxme/rust-tools:0.0.2 as rust_builder
