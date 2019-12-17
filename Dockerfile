@@ -22,7 +22,7 @@ FROM qmxme/rust-extra-tools:0.0.1 as rust_extra_builder
 
 # install terraform
 FROM qmxme/curl as terraform_builder
-RUN curl -L -o /tmp/terraform.zip https://releases.hashicorp.com/terraform/0.12.16/terraform_0.12.16_linux_amd64.zip
+RUN curl -L -o /tmp/terraform.zip https://releases.hashicorp.com/terraform/0.12.16/terraform_0.12.18_linux_amd64.zip
 RUN cd /usr/local/bin && unzip /tmp/terraform.zip && chmod 755 /usr/local/bin/terraform
 
 # install kubectl
@@ -39,7 +39,7 @@ RUN cp linux-amd64/helm /usr/local/bin
 
 # install docker-compose
 FROM qmxme/curl as compose_builder
-RUN curl -L "https://github.com/docker/compose/releases/download/1.23.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+RUN curl -L "https://github.com/docker/compose/releases/download/1.25.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
 RUN chmod 755 /usr/local/bin/docker-compose
 
 # install coursier
