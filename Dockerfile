@@ -225,7 +225,7 @@ RUN mkdir -p ~/bin ~/.cargo/bin ~/.config ~/tmp ~/.gnupg ~/.local ~/.vim && chmo
 RUN coursier bootstrap  --java-opt -Xss4m --java-opt -Xms100m --java-opt -Dmetals.client=coc.nvim org.scalameta:metals_2.12:0.7.6 -r bintray:scalacenter/releases -o ~/bin/metals-vim -f
 
 # dotfile setup
-RUN git clone -b 1.2.0 --recursive https://github.com/qmx/dotfiles.git ~/.dotfiles
+RUN git clone -b 1.3.0 --recursive https://github.com/qmx/dotfiles.git ~/.dotfiles
 RUN cd ~/.dotfiles && stow -v .
 
 # install rust
