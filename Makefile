@@ -6,6 +6,19 @@ VERSION ?= $(shell git describe --always --tags)
 REPO ?= qmxme
 IMAGE ?= ${REPO}/${name}
 
+BUILDX_VER=v0.3.1
+
+buildx-install:
+	mkdir -vp ~/.docker/cli-plugins/ ~/dockercache
+	curl --silent -L "https://github.com/docker/buildx/releases/download/${BUILDX_VER}/buildx-${BUILDX_VER}.linux-amd64" > ~/.docker/cli-plugins/docker-buildx
+	chmod a+x ~/.docker/cli-plugins/docker-buildx
+
+buildx-prepare: buildx-install
+	docker buildx create --use
+
+buildx:
+	docker buildx build --platform=linux/arm/v7,linux/amd64 -t ${IMAGE}:${VERSION} .
+
 build:
 	docker build ${DOCKER_BUILD_OPTS} -t ${IMAGE}:${VERSION} .
 
