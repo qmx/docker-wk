@@ -155,6 +155,7 @@ RUN echo "en_US.UTF-8 UTF-8" > /etc/locale.gen && \
 	locale-gen --purge $LANG && \
 	dpkg-reconfigure --frontend=noninteractive locales && \
 	update-locale LANG=$LANG LC_ALL=$LC_ALL LANGUAGE=$LANGUAGE
+RUN update-ca-certificates -f
 
 # enable yarn repo
 RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
