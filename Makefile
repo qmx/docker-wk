@@ -17,7 +17,7 @@ buildx-prepare: buildx-install
 	docker buildx create --use
 
 buildx:
-	docker buildx build --platform=linux/arm/v7,linux/amd64 -t ${IMAGE}:${VERSION} .
+	docker buildx build --platform=linux/arm/v7,linux/amd64 -t ${IMAGE}:${VERSION} --load .
 
 build:
 	docker build ${DOCKER_BUILD_OPTS} -t ${IMAGE}:${VERSION} .
