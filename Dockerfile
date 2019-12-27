@@ -71,7 +71,6 @@ RUN apt-get update -qq && apt-get upgrade -y && apt-get install -qq -y \
 	bat \
 	build-essential \
 	ca-certificates \
-	cargo \
 	clang \
 	cmake \
 	curl \
@@ -83,7 +82,6 @@ RUN apt-get update -qq && apt-get upgrade -y && apt-get install -qq -y \
 	docker.io \
 	entr \
 	exuberant-ctags \
-	fakeroot-ng \
 	fd-find \
 	flake8 \
 	fzf \
@@ -113,7 +111,6 @@ RUN apt-get update -qq && apt-get upgrade -y && apt-get install -qq -y \
 	mtr-tiny \
 	musl-tools \
 	ncdu \
-	neovim \
 	netcat-openbsd \
 	nodejs \
 	npm \
@@ -135,8 +132,6 @@ RUN apt-get update -qq && apt-get upgrade -y && apt-get install -qq -y \
 	restic \
 	ripgrep \
 	rsync \
-	rustc \
-	rust-src \
 	shellcheck \
 	socat \
 	sqlite3 \
@@ -229,7 +224,7 @@ RUN git clone -b 1.3.0 --recursive https://github.com/qmx/dotfiles.git ~/.dotfil
 RUN cd ~/.dotfiles && stow -v .
 
 # install rust
-RUN curl -sSf https://sh.rustup.rs | zsh -s -- -y --default-toolchain 1.39.0
+RUN curl -sSf https://sh.rustup.rs | zsh -s -- -y --default-toolchain 1.40.0
 RUN . /home/$user/.cargo/env && rustup toolchain link system /usr && rustup component add rustfmt rust-src rls
 RUN vim -c 'CocInstall -sync coc-rls coc-git coc-json coc-html|q'
 
