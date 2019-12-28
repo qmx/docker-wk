@@ -229,7 +229,6 @@ COPY --from=tools_jump /go/bin/jump /usr/local/bin/
 COPY --from=tools_dive /go/bin/dive /usr/local/bin/
 
 # rust essential crates
-COPY --from=rust_builder /opt/rust-tools/bin/* /usr/local/bin/
 COPY --from=rust_web_builder /opt/rust-tools/bin/* /usr/local/bin/
 COPY --from=rust_extra_builder /opt/rust-tools/bin/* /usr/local/bin/
 COPY --from=ra_builder /opt/rust-tools/bin/* /usr/local/bin/
