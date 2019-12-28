@@ -20,6 +20,26 @@ FROM rust_builderz as tools_wk
 ENV CARGO_INSTALL_ROOT /opt/rust-tools
 RUN cargo install wk
 
+FROM rust_builderz as tools_starship
+ENV CARGO_INSTALL_ROOT /opt/rust-tools
+RUN cargo install starship
+
+FROM rust_builderz as tools_cargo-edit
+ENV CARGO_INSTALL_ROOT /opt/rust-tools
+RUN cargo install cargo-edit
+
+FROM rust_builderz as tools_cargo-watch
+ENV CARGO_INSTALL_ROOT /opt/rust-tools
+RUN cargo install cargo-watch
+
+FROM rust_builderz as tools_cargo-tree
+ENV CARGO_INSTALL_ROOT /opt/rust-tools
+RUN cargo install cargo-tree
+
+FROM rust_builderz as tools_cargo-expand
+ENV CARGO_INSTALL_ROOT /opt/rust-tools
+RUN cargo install cargo-expand
+
 FROM rust_builderz as tools_cargo-docserver
 ENV CARGO_INSTALL_ROOT /opt/rust-tools
 RUN cargo install cargo-docserver
@@ -31,10 +51,10 @@ FROM golang:1.13 as tools_dive
 RUN go get github.com/wagoodman/dive
 
 # rust-analyzer
-FROM qmxme/rust-analyzer:0.0.2 as ra_builder
-
-# rust tools
-FROM qmxme/rust-tools:0.0.2 as rust_builder
+FROM rust_builderz as ra_builder
+ENV CARGO_INSTALL_ROOT /opt/rust-tools
+ENV RA_COMMIT 431836f4a01dda39d10f6275915f9c8e99a28028
+RUN git clone https://github.com/rust-analyzer/rust-analyzer.git /tmp/rust-analyzer && cd /tmp/rust-analyzer && git checkout -f $RA_COMMIT && cargo xtask install --server
 
 # rust web tools
 FROM qmxme/rust-web-tools:0.0.1 as rust_web_builder
@@ -198,6 +218,11 @@ COPY --from=ssh_host_keys /etc/ssh/ssh_host* /etc/ssh/
 COPY --from=tools_cpubars /opt/rust-tools/bin/* /usr/local/bin/
 COPY --from=tools_wk /opt/rust-tools/bin/* /usr/local/bin/
 COPY --from=tools_cargo-docserver /opt/rust-tools/bin/* /usr/local/bin/
+COPY --from=tools_starship /opt/rust-tools/bin/* /usr/local/bin/
+COPY --from=tools_cargo-edit /opt/rust-tools/bin/* /usr/local/bin/
+COPY --from=tools_cargo-watch /opt/rust-tools/bin/* /usr/local/bin/
+COPY --from=tools_cargo-tree /opt/rust-tools/bin/* /usr/local/bin/
+COPY --from=tools_cargo-expand /opt/rust-tools/bin/* /usr/local/bin/
 
 # golang tools
 COPY --from=tools_jump /go/bin/jump /usr/local/bin/
