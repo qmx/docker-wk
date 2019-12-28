@@ -11,6 +11,8 @@ FROM debian:sid@$DEBIAN_SID_HASH as debian_base
 FROM debian_base as rust_builderz
 RUN apt-get update && apt-get install -qq -y curl build-essential
 RUN apt-get install -y rustc cargo
+RUN apt-get install -y git
+RUN apt-get install -y pkg-config libssl-dev
 
 FROM rust_builderz as tools_cpubars
 ENV CARGO_INSTALL_ROOT /opt/rust-tools
