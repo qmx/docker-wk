@@ -45,7 +45,7 @@ RUN cargo install cargo-docserver
 
 FROM golang:1.13 as tools_vim-go
 RUN apt-get update -q && apt-get install -y -qq vim-nox
-RUN git clone -b v1.21https://github.com/fatih/vim-go.git /root/.vim/pack/lang/start/vim-go
+RUN git clone -b v1.21 https://github.com/fatih/vim-go.git /root/.vim/pack/lang/start/vim-go
 RUN vim +":set nomore" +GoInstallBinaries +qall
 
 FROM golang:1.13 as tools_jump
