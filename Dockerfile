@@ -8,6 +8,14 @@ FROM qmxme/golang-tools:0.0.1 as golang_builder
 # define default base debian image
 FROM debian:sid@$DEBIAN_SID_HASH as debian_base
 
+FROM debian_base as rust_builderz
+RUN apt-get update && apt-get install -qq -y curl build-essential
+RUN apt-get install -y rustc cargo
+
+FROM rust_builderz as tools_cpubars
+ENV CARGO_INSTALL_ROOT /opt/rust-tools
+RUN cargo install cpubars
+
 # rust-analyzer
 FROM qmxme/rust-analyzer:0.0.2 as ra_builder
 
@@ -173,7 +181,7 @@ RUN echo 'StreamLocalBindUnlink yes' >> /etc/ssh/sshd_config
 COPY --from=ssh_host_keys /etc/ssh/ssh_host* /etc/ssh/
 
 # rust tools
-RUN curl -L -o /tmp/cpubars_0.2.1_amd64.deb https://github.com/qmx/cpubars/releases/download/0.2.1/cpubars_0.2.1_amd64.deb && dpkg -i /tmp/cpubars_0.2.1_amd64.deb && rm /tmp/*.deb
+COPY --from=tools_cpubars /opt/rust-tools/bin/* /usr/local/bin/
 RUN curl -L -o /tmp/marinara_0.2.0_amd64.deb https://github.com/qmx/marinara/releases/download/0.2.0/marinara_0.2.0_amd64.deb && dpkg -i /tmp/marinara_0.2.0_amd64.deb && rm /tmp/*.deb
 RUN curl -L -o /tmp/jump_0.22.0_amd64.deb https://github.com/gsamokovarov/jump/releases/download/v0.22.0/jump_0.22.0_amd64.deb && dpkg -i /tmp/jump_0.22.0_amd64.deb && rm /tmp/*.deb
 RUN curl -L -o /tmp/wk_0.4.0_amd64.deb https://github.com/qmx/wk/releases/download/0.4.0/wk_0.4.0_amd64.deb && dpkg -i /tmp/wk_0.4.0_amd64.deb && rm /tmp/*.deb
