@@ -77,24 +77,28 @@ FROM qmxme/rust-extra-tools:0.0.1 as rust_extra_builder
 
 # install terraform
 FROM qmxme/curl as terraform_builder
-RUN curl -L -o /tmp/terraform.zip https://releases.hashicorp.com/terraform/0.12.18/terraform_0.12.18_linux_amd64.zip
+ARG TARGETARCH
+RUN curl -L -o /tmp/terraform.zip https://releases.hashicorp.com/terraform/0.12.18/terraform_0.12.18_linux_$TARGETARCH.zip
 RUN cd /usr/local/bin && unzip /tmp/terraform.zip && chmod 755 /usr/local/bin/terraform
 
 # install kubectl
 FROM qmxme/curl as kubectl_builder
-RUN curl -L -o /usr/local/bin/kubectl https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
+ARG TARGETARCH
+RUN curl -L -o /usr/local/bin/kubectl https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/$TARGETARCH/kubectl
 RUN chmod 755 /usr/local/bin/kubectl
 
 # install helm
 FROM qmxme/curl as helm_builder
-RUN curl -L -o /tmp/helm.tar.gz https://get.helm.sh/helm-v3.0.0-linux-amd64.tar.gz
+ARG TARGETARCH
+RUN curl -L -o /tmp/helm.tar.gz https://get.helm.sh/helm-v3.0.0-linux-$TARGETARCH.tar.gz
 WORKDIR /tmp
 RUN tar -zxvf helm.tar.gz
-RUN cp linux-amd64/helm /usr/local/bin
+RUN cp linux-$TARGETARCH/helm /usr/local/bin
 
 # install docker-compose
 FROM qmxme/curl as compose_builder
-RUN curl -L "https://github.com/docker/compose/releases/download/1.25.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+ARG TARGETARCH
+RUN curl -L "https://github.com/docker/compose/releases/download/1.25.0/docker-compose-$(uname -s)-$TARGETARCH" -o /usr/local/bin/docker-compose
 RUN chmod 755 /usr/local/bin/docker-compose
 
 # install coursier
