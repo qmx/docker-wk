@@ -2,9 +2,6 @@ ARG DEBIAN_BUSTER_HASH=sha256:9646b0ee6d68448e09cdee7ac8deb336e519113e5717ec0856
 ARG DEBIAN_SID_HASH=sha256:fc6ae865d58728644a7242375b777a03c8933600c0aff9df491e745b15ba9d3e
 ARG SSH_HOST_KEYS_HASH=sha256:9a6630c2fbed11a3f806c5a5c1fe1550b628311d8701680fd740cae94b377e6c
 
-## golang tools
-FROM qmxme/golang-tools:0.0.1 as golang_builder
-
 # define default base debian image
 FROM debian:sid@$DEBIAN_SID_HASH as debian_base
 
@@ -51,6 +48,15 @@ RUN go get github.com/gsamokovarov/jump
 
 FROM golang:1.13 as tools_dive
 RUN go get github.com/wagoodman/dive
+
+FROM golang:1.13 as tools_gitversion
+RUN GO111MODULE=on go get github.com/screwdriver-cd/gitversion@v1.1.3
+
+FROM golang:1.13 as tools_reg
+RUN go get github.com/genuinetools/reg
+
+FROM golang:1.13 as tools_dep
+RUN go get github.com/golang/dep/cmd/dep
 
 # rust-analyzer
 FROM rust_builderz as ra_builder
@@ -229,14 +235,14 @@ COPY --from=tools_cargo-expand /opt/rust-tools/bin/* /usr/local/bin/
 # golang tools
 COPY --from=tools_jump /go/bin/jump /usr/local/bin/
 COPY --from=tools_dive /go/bin/dive /usr/local/bin/
+COPY --from=tools_gitversion /go/bin/gitversion /usr/local/bin/
+COPY --from=tools_reg /go/bin/reg /usr/local/bin/
+COPY --from=tools_dep /go/bin/dep /usr/local/bin/
 
 # rust essential crates
 COPY --from=rust_web_builder /opt/rust-tools/bin/* /usr/local/bin/
 COPY --from=rust_extra_builder /opt/rust-tools/bin/* /usr/local/bin/
 COPY --from=ra_builder /opt/rust-tools/bin/* /usr/local/bin/
-
-# golang tools
-COPY --from=golang_builder /go/bin/* /usr/local/bin/
 
 # terraform
 COPY --from=terraform_builder /usr/local/bin/terraform /usr/local/bin/
