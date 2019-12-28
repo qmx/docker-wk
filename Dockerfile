@@ -24,6 +24,12 @@ FROM rust_builderz as tools_cargo-docserver
 ENV CARGO_INSTALL_ROOT /opt/rust-tools
 RUN cargo install cargo-docserver
 
+FROM golang:1.13 as tools_jump
+RUN go get github.com/gsamokovarov/jump
+
+FROM golang:1.13 as tools_dive
+RUN go get github.com/wagoodman/dive
+
 # rust-analyzer
 FROM qmxme/rust-analyzer:0.0.2 as ra_builder
 
@@ -192,10 +198,10 @@ COPY --from=ssh_host_keys /etc/ssh/ssh_host* /etc/ssh/
 COPY --from=tools_cpubars /opt/rust-tools/bin/* /usr/local/bin/
 COPY --from=tools_wk /opt/rust-tools/bin/* /usr/local/bin/
 COPY --from=tools_cargo-docserver /opt/rust-tools/bin/* /usr/local/bin/
-RUN curl -L -o /tmp/jump_0.22.0_amd64.deb https://github.com/gsamokovarov/jump/releases/download/v0.22.0/jump_0.22.0_amd64.deb && dpkg -i /tmp/jump_0.22.0_amd64.deb && rm /tmp/*.deb
 
-# install dive
-RUN curl -L -o /tmp/dive.deb https://github.com/wagoodman/dive/releases/download/v0.9.1/dive_0.9.1_linux_amd64.deb && dpkg -i /tmp/dive.deb && rm /tmp/*.deb
+# golang tools
+COPY --from=tools_jump /go/bin/jump /usr/local/bin/
+COPY --from=tools_dive /go/bin/dive /usr/local/bin/
 
 # rust essential crates
 COPY --from=rust_builder /opt/rust-tools/bin/* /usr/local/bin/
