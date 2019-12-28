@@ -16,6 +16,14 @@ FROM rust_builderz as tools_cpubars
 ENV CARGO_INSTALL_ROOT /opt/rust-tools
 RUN cargo install cpubars
 
+FROM rust_builderz as tools_wk
+ENV CARGO_INSTALL_ROOT /opt/rust-tools
+RUN cargo install wk
+
+FROM rust_builderz as tools_cargo-docserver
+ENV CARGO_INSTALL_ROOT /opt/rust-tools
+RUN cargo install cargo-docserver
+
 # rust-analyzer
 FROM qmxme/rust-analyzer:0.0.2 as ra_builder
 
@@ -182,10 +190,9 @@ COPY --from=ssh_host_keys /etc/ssh/ssh_host* /etc/ssh/
 
 # rust tools
 COPY --from=tools_cpubars /opt/rust-tools/bin/* /usr/local/bin/
-RUN curl -L -o /tmp/marinara_0.2.0_amd64.deb https://github.com/qmx/marinara/releases/download/0.2.0/marinara_0.2.0_amd64.deb && dpkg -i /tmp/marinara_0.2.0_amd64.deb && rm /tmp/*.deb
+COPY --from=tools_wk /opt/rust-tools/bin/* /usr/local/bin/
+COPY --from=tools_cargo-docserver /opt/rust-tools/bin/* /usr/local/bin/
 RUN curl -L -o /tmp/jump_0.22.0_amd64.deb https://github.com/gsamokovarov/jump/releases/download/v0.22.0/jump_0.22.0_amd64.deb && dpkg -i /tmp/jump_0.22.0_amd64.deb && rm /tmp/*.deb
-RUN curl -L -o /tmp/wk_0.4.0_amd64.deb https://github.com/qmx/wk/releases/download/0.4.0/wk_0.4.0_amd64.deb && dpkg -i /tmp/wk_0.4.0_amd64.deb && rm /tmp/*.deb
-RUN curl -L -o /tmp/cargo-docserver_0.1.2_amd64.deb https://github.com/qmx/cargo-docserver/releases/download/0.1.2/cargo-docserver_0.1.2_amd64.deb && dpkg -i /tmp/cargo-docserver_0.1.2_amd64.deb && rm /tmp/*.deb
 
 # install dive
 RUN curl -L -o /tmp/dive.deb https://github.com/wagoodman/dive/releases/download/v0.9.1/dive_0.9.1_linux_amd64.deb && dpkg -i /tmp/dive.deb && rm /tmp/*.deb
