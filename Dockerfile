@@ -5,75 +5,20 @@ ARG SSH_HOST_KEYS_HASH=sha256:9a6630c2fbed11a3f806c5a5c1fe1550b628311d8701680fd7
 # define default base debian image
 FROM debian:sid@$DEBIAN_SID_HASH as debian_base
 
-FROM debian_base as rust_builderz
-RUN apt-get update && apt-get install -qq -y curl build-essential
-RUN apt-get install -y rustc cargo
-RUN apt-get install -y git
-RUN apt-get install -y pkg-config libssl-dev
-
-FROM rust_builderz as tools_cpubars
-ENV CARGO_INSTALL_ROOT /opt/rust-tools
-RUN cargo install cpubars
-
-FROM rust_builderz as tools_wk
-ENV CARGO_INSTALL_ROOT /opt/rust-tools
-RUN cargo install wk
-
-FROM rust_builderz as tools_starship
-ENV CARGO_INSTALL_ROOT /opt/rust-tools
-RUN cargo install starship
-
-FROM rust_builderz as tools_cargo-edit
-ENV CARGO_INSTALL_ROOT /opt/rust-tools
-RUN cargo install cargo-edit
-
-FROM rust_builderz as tools_cargo-watch
-ENV CARGO_INSTALL_ROOT /opt/rust-tools
-RUN cargo install cargo-watch
-
-FROM rust_builderz as tools_cargo-tree
-ENV CARGO_INSTALL_ROOT /opt/rust-tools
-RUN cargo install cargo-tree
-
-FROM rust_builderz as tools_cargo-expand
-ENV CARGO_INSTALL_ROOT /opt/rust-tools
-RUN cargo install cargo-expand
-
-FROM rust_builderz as tools_cargo-docserver
-ENV CARGO_INSTALL_ROOT /opt/rust-tools
-RUN cargo install cargo-docserver
-
-FROM golang:1.13 as tools_vim-go
-RUN apt-get update -q && apt-get install -y -qq vim-nox
-RUN git clone -b v1.21 https://github.com/fatih/vim-go.git /root/.vim/pack/lang/start/vim-go
-RUN vim +":set nomore" +GoInstallBinaries +qall
-
-FROM golang:1.13 as tools_jump
-RUN go get github.com/gsamokovarov/jump
-
-FROM golang:1.13 as tools_dive
-RUN go get github.com/wagoodman/dive
-
-FROM golang:1.13 as tools_gitversion
-RUN GO111MODULE=on go get github.com/screwdriver-cd/gitversion@v1.1.3
-
-FROM golang:1.13 as tools_reg
-RUN go get github.com/genuinetools/reg
-
-FROM golang:1.13 as tools_dep
-RUN go get github.com/golang/dep/cmd/dep
+# golang tools
+FROM qmxme/golang-tools:1.0.1 as golang_builder
 
 # rust-analyzer
-FROM rust_builderz as ra_builder
-ENV CARGO_INSTALL_ROOT /opt/rust-tools
-ENV RA_COMMIT 431836f4a01dda39d10f6275915f9c8e99a28028
-RUN git clone https://github.com/rust-analyzer/rust-analyzer.git /tmp/rust-analyzer && cd /tmp/rust-analyzer && git checkout -f $RA_COMMIT && cargo xtask install --server
+FROM qmxme/rust-analyzer:1.0.0 as ra_builder
+
+# rust tools
+FROM qmxme/rust-tools:1.0.0 as rust_tools_builder
 
 # rust web tools
-FROM qmxme/rust-web-tools:0.0.1 as rust_web_builder
+FROM qmxme/rust-web-tools:1.0.0 as rust_web_builder
 
 # rust extra tools
-FROM qmxme/rust-extra-tools:0.0.1 as rust_extra_builder
+#FROM qmxme/rust-extra-tools:0.0.1 as rust_extra_builder
 
 # install terraform
 FROM qmxme/curl as terraform_builder
@@ -231,30 +176,14 @@ RUN sed 's/#Port 22/Port 3222/' -i /etc/ssh/sshd_config
 RUN echo 'StreamLocalBindUnlink yes' >> /etc/ssh/sshd_config
 COPY --from=ssh_host_keys /etc/ssh/ssh_host* /etc/ssh/
 
-# rust tools
-COPY --from=tools_cpubars /opt/rust-tools/bin/* /usr/local/bin/
-COPY --from=tools_wk /opt/rust-tools/bin/* /usr/local/bin/
-COPY --from=tools_cargo-docserver /opt/rust-tools/bin/* /usr/local/bin/
-COPY --from=tools_starship /opt/rust-tools/bin/* /usr/local/bin/
-COPY --from=tools_cargo-edit /opt/rust-tools/bin/* /usr/local/bin/
-COPY --from=tools_cargo-watch /opt/rust-tools/bin/* /usr/local/bin/
-COPY --from=tools_cargo-tree /opt/rust-tools/bin/* /usr/local/bin/
-COPY --from=tools_cargo-expand /opt/rust-tools/bin/* /usr/local/bin/
-
 # golang tools
-COPY --from=tools_jump /go/bin/jump /usr/local/bin/
-COPY --from=tools_dive /go/bin/dive /usr/local/bin/
-COPY --from=tools_gitversion /go/bin/gitversion /usr/local/bin/
-COPY --from=tools_reg /go/bin/reg /usr/local/bin/
-COPY --from=tools_dep /go/bin/dep /usr/local/bin/
-
-# vim-go binaries
-COPY --from=tools_vim-go /go/bin/* /usr/local/bin/
+COPY --from=golang_builder /usr/local/bin/* /usr/local/bin/
 
 # rust essential crates
+COPY --from=ra_builder /opt/rust-tools/bin/* /usr/local/bin/
+COPY --from=rust_tools_builder /usr/local/bin/* /usr/local/bin/
 COPY --from=rust_web_builder /opt/rust-tools/bin/* /usr/local/bin/
 COPY --from=rust_extra_builder /opt/rust-tools/bin/* /usr/local/bin/
-COPY --from=ra_builder /opt/rust-tools/bin/* /usr/local/bin/
 
 # terraform
 COPY --from=terraform_builder /usr/local/bin/terraform /usr/local/bin/
