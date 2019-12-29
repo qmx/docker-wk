@@ -12,7 +12,7 @@ FROM qmxme/golang-tools:1.0.1 as golang_builder
 FROM qmxme/rust-analyzer:1.0.0 as ra_builder
 
 # rust tools
-FROM qmxme/rust-tools:1.0.0 as rust_tools_builder
+FROM qmxme/rust-tools:1.1.0 as rust_tools_builder
 
 # rust web tools
 FROM qmxme/rust-web-tools:1.0.0 as rust_web_builder
