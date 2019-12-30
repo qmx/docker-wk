@@ -67,7 +67,7 @@ COPY --from=golang_builder /usr/local/bin/* /usr/local/bin/
 # rust essential crates
 COPY --from=ra_builder /opt/rust-tools/bin/* /usr/local/bin/
 COPY --from=rust_tools_builder /usr/local/bin/* /usr/local/bin/
-COPY --from=rust_web_builder /opt/rust-tools/bin/* /usr/local/bin/
+COPY --from=rust_web_builder /usr/local/bin/* /usr/local/bin/
 COPY --from=rust_extra_builder /opt/rust-tools/bin/* /usr/local/bin/
 
 # some individually compiled tools
