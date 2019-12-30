@@ -59,7 +59,7 @@ FROM qmxme/openssh@$SSH_HOST_KEYS_HASH as ssh_host_keys
 FROM qmxme/base:0.1.0
 
 # base tools
-COPY --from=base_tools /usr/local/bin/* /usr/local/bin/
+COPY --from=base_tools_builder /usr/local/bin/* /usr/local/bin/
 
 # golang tools
 COPY --from=golang_builder /usr/local/bin/* /usr/local/bin/
