@@ -1,9 +1,6 @@
-ARG DEBIAN_BUSTER_HASH=sha256:9646b0ee6d68448e09cdee7ac8deb336e519113e5717ec0856d38ca813912930
-ARG DEBIAN_SID_HASH=sha256:fc6ae865d58728644a7242375b777a03c8933600c0aff9df491e745b15ba9d3e
 ARG SSH_HOST_KEYS_HASH=sha256:9a6630c2fbed11a3f806c5a5c1fe1550b628311d8701680fd740cae94b377e6c
 
-# define default base debian image
-FROM debian:sid@$DEBIAN_SID_HASH as debian_base
+FROM qmxme/base-tools:0.0.1 as base_tools_builder
 
 # golang tools
 FROM qmxme/golang-tools:1.0.1 as golang_builder
@@ -56,6 +53,9 @@ FROM qmxme/openssh@$SSH_HOST_KEYS_HASH as ssh_host_keys
 
 # base distro
 FROM qmxme/base:0.1.0
+
+# base tools
+COPY --from=base_tools /usr/local/bin/* /usr/local/bin/
 
 # golang tools
 COPY --from=golang_builder /usr/local/bin/* /usr/local/bin/
