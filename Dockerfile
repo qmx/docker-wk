@@ -9,13 +9,17 @@ FROM qmxme/golang-tools:1.0.1 as golang_builder
 FROM qmxme/rust-analyzer:1.0.0 as ra_builder
 
 # rust tools
-FROM qmxme/rust-tools:1.2.0 as rust_tools_builder
+FROM qmxme/rust-tools:1.2.1 as rust_tools_builder
 
 # rust web tools
 FROM qmxme/rust-web-tools:1.0.0 as rust_web_builder
 
 # rust extra tools
-#FROM qmxme/rust-extra-tools:0.0.1 as rust_extra_builder
+FROM qmxme/rust-extra-tools:0.0.1 as rust_extra_builder
+
+# some individually compiled tools
+FROM qmxme/cargo-docserver:v0.2.0 as tool_cargo-docserver
+FROM qmxme/cpubars:v0.3.2 as  tool_cpubars
 
 # install terraform
 FROM qmxme/curl as terraform_builder
@@ -65,6 +69,10 @@ COPY --from=ra_builder /opt/rust-tools/bin/* /usr/local/bin/
 COPY --from=rust_tools_builder /usr/local/bin/* /usr/local/bin/
 COPY --from=rust_web_builder /opt/rust-tools/bin/* /usr/local/bin/
 COPY --from=rust_extra_builder /opt/rust-tools/bin/* /usr/local/bin/
+
+# some individually compiled tools
+COPY --from=tool_cpubars /opt/rust-tools/bin/* /usr/local/bin/
+COPY --from=tool_cargo-docserver /opt/rust-tools/bin/* /usr/local/bin/
 
 # terraform
 COPY --from=terraform_builder /usr/local/bin/terraform /usr/local/bin/
