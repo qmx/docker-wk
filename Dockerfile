@@ -1,6 +1,6 @@
 ARG SSH_HOST_KEYS_HASH=sha256:9a6630c2fbed11a3f806c5a5c1fe1550b628311d8701680fd740cae94b377e6c
 
-FROM qmxme/base-tools:0.0.1 as base_tools_builder
+FROM qmxme/base-tools:0.0.2 as base_tools_builder
 
 # golang tools
 FROM qmxme/golang-tools:1.0.1 as golang_builder
@@ -20,6 +20,7 @@ FROM qmxme/rust-extra-tools:0.1.0 as rust_extra_builder
 # some individually compiled tools
 FROM qmxme/cargo-docserver:v0.2.0 as tool_cargo-docserver
 FROM qmxme/cpubars:v0.3.2 as  tool_cpubars
+FROM qmxme/wk-cli:v0.4.1 as tool_wk-cli
 
 # install terraform
 FROM qmxme/curl as terraform_builder
@@ -73,6 +74,7 @@ COPY --from=rust_extra_builder /usr/local/bin/* /usr/local/bin/
 # some individually compiled tools
 COPY --from=tool_cpubars /opt/rust-tools/bin/* /usr/local/bin/
 COPY --from=tool_cargo-docserver /opt/rust-tools/bin/* /usr/local/bin/
+COPY --from=tool_wk-cli /opt/rust-tools/bin/* /usr/local/bin/
 
 # terraform
 COPY --from=terraform_builder /usr/local/bin/terraform /usr/local/bin/
