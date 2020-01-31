@@ -42,12 +42,6 @@ WORKDIR /tmp
 RUN tar -zxvf helm.tar.gz
 RUN cp linux-$TARGETARCH/helm /usr/local/bin
 
-# install docker-compose
-FROM qmxme/curl as compose_builder
-ARG TARGETARCH
-RUN curl -L "https://github.com/docker/compose/releases/download/1.25.0/docker-compose-$(uname -s)-$TARGETARCH" -o /usr/local/bin/docker-compose
-RUN chmod 755 /usr/local/bin/docker-compose
-
 # install coursier
 FROM qmxme/curl as coursier_builder
 RUN curl -L -o /usr/local/bin/coursier https://github.com/coursier/coursier/releases/download/v2.0.0-RC5-2/coursier
@@ -57,7 +51,7 @@ RUN chmod 755 /usr/local/bin/coursier
 FROM qmxme/openssh@$SSH_HOST_KEYS_HASH as ssh_host_keys
 
 # base distro
-FROM qmxme/base:0.1.0
+FROM qmxme/base:0.1.1
 
 # base tools
 COPY --from=base_tools_builder /usr/local/bin/* /usr/local/bin/
@@ -84,9 +78,6 @@ COPY --from=kubectl_builder /usr/local/bin/kubectl /usr/local/bin/
 
 # helm
 COPY --from=helm_builder /usr/local/bin/helm /usr/local/bin/
-
-# docker-compose
-COPY --from=compose_builder /usr/local/bin/docker-compose /usr/local/bin/
 
 # coursier
 COPY --from=coursier_builder /usr/local/bin/coursier /usr/local/bin/
