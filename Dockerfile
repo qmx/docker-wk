@@ -6,7 +6,7 @@ FROM qmxme/base-tools:0.0.2 as base_tools_builder
 FROM qmxme/golang-tools:1.0.1 as golang_builder
 
 # rust-analyzer
-FROM qmxme/rust-analyzer:1.1.0 as ra_builder
+FROM qmxme/rust-analyzer:1.2.0 as ra_builder
 
 # rust tools
 FROM qmxme/rust-tools:1.2.1 as rust_tools_builder
