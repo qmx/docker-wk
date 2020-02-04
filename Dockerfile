@@ -51,7 +51,7 @@ RUN chmod 755 /usr/local/bin/coursier
 FROM qmxme/openssh@$SSH_HOST_KEYS_HASH as ssh_host_keys
 
 # base distro
-FROM qmxme/base:0.1.1
+FROM qmxme/base:0.1.2
 
 # base tools
 COPY --from=base_tools_builder /usr/local/bin/* /usr/local/bin/
