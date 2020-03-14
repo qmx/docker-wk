@@ -19,6 +19,7 @@ FROM qmxme/rust-extra-tools:0.1.0 as rust_extra_builder
 
 # some individually compiled tools
 FROM qmxme/curl as tool_cargo-docserver
+ARG TARGETARCH
 ARG TARGETVARIANT
 RUN curl -sL -o /usr/local/bin/cargo-docserver "$(curl -sL https://api.github.com/repos/qmx/cargo-docserver/releases/tags/v0.3.0 | jq -r '.assets[].browser_download_url' | grep $TARGETARCH$TARGETVARIANT)"
 RUN chmod +x /usr/local/bin/cargo-docserver
