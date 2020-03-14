@@ -27,7 +27,7 @@ RUN chmod +x /usr/local/bin/cargo-docserver
 FROM qmxme/curl as tool_cpubars
 ARG TARGETARCH
 ARG TARGETVARIANT
-RUN curl -sL -o /usr/local/bin/cpubars "$(curl -sL https://api.github.com/repos/qmx/cpubars/releases/tags/v0.4.2 | jq -r '.assets[].browser_download_url' | grep $TARGETARCH$TARGETVARIANT)"
+RUN curl -sL -o /usr/local/bin/cpubars "$(curl -sL https://api.github.com/repos/qmx/cpubars/releases/tags/v0.4.3 | jq -r '.assets[].browser_download_url' | grep $TARGETARCH$TARGETVARIANT)"
 RUN chmod +x /usr/local/bin/cpubars
 
 FROM qmxme/curl as tool_wk
