@@ -115,7 +115,7 @@ RUN git clone -b 1.5.2 --recursive https://github.com/qmx/dotfiles.git ~/.dotfil
 RUN cd ~/.dotfiles && stow -v .
 
 # install rust
-RUN curl -sSf https://sh.rustup.rs | zsh -s -- -y --default-toolchain 1.40.0
+RUN curl -sSf https://sh.rustup.rs | zsh -s -- -y --default-toolchain 1.42.0
 RUN . /home/$user/.cargo/env && rustup component add rustfmt rust-src rls
 RUN vim -c 'CocInstall -sync |q'
 
