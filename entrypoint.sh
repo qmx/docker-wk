@@ -10,6 +10,20 @@ if [ -S "/var/run/docker.sock" ]; then
        fi
 fi
 
+init(){
+	local pcscd_running
+	pcscd_running=$(pgrep pcscd)
+	if [ -z "$pcscd_running" ]; then
+		echo "starting pcscd in backgroud"
+		pcscd --debug --apdu
+		pcscd --hotplug
+	else
+		echo "pcscd is running in already: ${pcscd_running}"
+	fi
+}
+
+init
+
 HOSTNAME="$(hostname)"
 echo "127.0.0.1 $HOSTNAME" >> /etc/hosts
 
