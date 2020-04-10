@@ -10,6 +10,18 @@ if [ -S "/var/run/docker.sock" ]; then
        fi
 fi
 
+# ensure basic directories exist with proper permissions
+if [ ! -d "/mnt/codez/dev" ]; then
+	mkdir -p "/mnt/codez/dev"
+	chown qmx:users "/mnt/codez/dev"
+fi
+
+if [ ! -d "/mnt/secretz/qmx/pack" ]; then
+	mkdir -p "/mnt/secretz/qmx/pack"
+	chown -R qmx:users "/mnt/secretz/qmx"
+	chmod -R g-rwx,o-rwx "/mnt/secretz/qmx"
+fi
+
 init(){
 	local pcscd_running
 	pcscd_running=$(pgrep pcscd)
