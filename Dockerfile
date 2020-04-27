@@ -18,23 +18,9 @@ FROM qmxme/rust-web-tools:1.0.0 as rust_web_builder
 FROM qmxme/rust-extra-tools:0.1.0 as rust_extra_builder
 
 # some individually compiled tools
-FROM qmxme/curl as tool_cargo-docserver
-ARG TARGETARCH
-ARG TARGETVARIANT
-RUN curl -sL -o /usr/local/bin/cargo-docserver "$(curl -sL https://api.github.com/repos/qmx/cargo-docserver/releases/tags/v0.3.0 | jq -r '.assets[].browser_download_url' | grep $TARGETARCH$TARGETVARIANT)"
-RUN chmod +x /usr/local/bin/cargo-docserver
-
-FROM qmxme/curl as tool_cpubars
-ARG TARGETARCH
-ARG TARGETVARIANT
-RUN curl -sL -o /usr/local/bin/cpubars "$(curl -sL https://api.github.com/repos/qmx/cpubars/releases/tags/v0.4.3 | jq -r '.assets[].browser_download_url' | grep $TARGETARCH$TARGETVARIANT)"
-RUN chmod +x /usr/local/bin/cpubars
-
-FROM qmxme/curl as tool_wk
-ARG TARGETARCH
-ARG TARGETVARIANT
-RUN curl -sL -o /usr/local/bin/wk "$(curl -sL https://api.github.com/repos/qmx/wk-cli/releases/tags/v0.4.2 | jq -r '.assets[].browser_download_url' | grep $TARGETARCH$TARGETVARIANT)"
-RUN chmod +x /usr/local/bin/wk
+FROM qmxme/cargo-docserver:v0.2.0 as tool_cargo-docserver
+FROM qmxme/cpubars:v0.3.2 as  tool_cpubars
+FROM qmxme/wk-cli:v0.4.1 as tool_wk-cli
 
 # install terraform
 FROM qmxme/curl as terraform_builder
@@ -80,9 +66,9 @@ COPY --from=rust_web_builder /usr/local/bin/* /usr/local/bin/
 COPY --from=rust_extra_builder /usr/local/bin/* /usr/local/bin/
 
 # some individually compiled tools
-COPY --from=tool_cpubars /usr/local/bin/* /usr/local/bin/
-COPY --from=tool_cargo-docserver /usr/local/bin/* /usr/local/bin/
-COPY --from=tool_wk /usr/local/bin/* /usr/local/bin/
+COPY --from=tool_cpubars /opt/rust-tools/bin/* /usr/local/bin/
+COPY --from=tool_cargo-docserver /opt/rust-tools/bin/* /usr/local/bin/
+COPY --from=tool_wk-cli /opt/rust-tools/bin/* /usr/local/bin/
 
 # terraform
 COPY --from=terraform_builder /usr/local/bin/terraform /usr/local/bin/
