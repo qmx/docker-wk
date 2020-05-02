@@ -13,6 +13,7 @@ jobs:
       matrix:
         target:
           - "linux/amd64"
+          - "linux/arm/v7"
 
     steps:
       - name: checkout
