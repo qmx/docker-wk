@@ -34,7 +34,10 @@ init(){
 	fi
 }
 
-init
+if [ -n "${YUBIKEY}" ]; then
+	init
+fi
+
 
 HOSTNAME="$(hostname)"
 echo "127.0.0.1 $HOSTNAME" >> /etc/hosts
