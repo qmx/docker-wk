@@ -41,11 +41,5 @@ jobs:
       - name: login to docker hub
         run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
-      - name: build
-        run: docker buildx build --platform ${{ matrix.target }}  -o type=tar,dest=./wk-${{ steps.sane_arch.outputs.arch }}.tar -t "${{ steps.container.outputs.image }}:latest-${{ steps.sane_arch.outputs.arch }}" .
-
-      - name: save intermediary state
-        uses: actions/upload-artifact@v2
-        with:
-          name: wk-${{ steps.sane_arch.outputs.arch }}.tar
-          path: ./wk-${{ steps.sane_arch.outputs.arch }}.tar
+      - name: build and push latest
+        run: docker buildx build --platform ${{ matrix.target }}  --push -t "${{ steps.container.outputs.image }}:latest-${{ steps.sane_arch.outputs.arch }}" .
