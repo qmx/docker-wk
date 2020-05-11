@@ -23,14 +23,13 @@ jobs:
         id: buildx
         uses: crazy-max/ghaction-docker-buildx@v1
         with:
-          version: v0.3.1
+          buildx-version: v0.3.1
 
       - name: get the version
         id: container
         uses: qmx/ghaction-container-tag@master
         with:
           dockerhub_namespace: "${{ secrets.DOCKERHUB_NAMESPACE }}"
-
 
       - name: convert the arch
         id: sane_arch
@@ -42,4 +41,53 @@ jobs:
         run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
       - name: build and push latest
-        run: docker buildx build --platform ${{ matrix.target }}  --push -t "${{ steps.container.outputs.image }}:latest-${{ steps.sane_arch.outputs.arch }}" .
+        run: docker buildx build --platform ${{ matrix.target }} --load -t "${{ steps.container.outputs.image }}:latest-${{ steps.sane_arch.outputs.arch }}" .
+
+      - name: store intermediate image
+        run: docker save "${{ steps.container.outputs.image }}:latest-${{ steps.sane_arch.outputs.arch }}" | gzip > "${{ steps.container.outputs.image }}:latest-${{ steps.sane_arch.outputs.arch }}.tar.gz"
+
+      - name: upload artifacts
+        uses: actions/upload-artifact@v1
+        with:
+          name: "${{ steps.container.outputs.image }}:latest-${{ steps.sane_arch.outputs.arch }}.tar.gz"
+          path: "${{ steps.container.outputs.image }}:latest-${{ steps.sane_arch.outputs.arch }}.tar.gz"
+
+  assemble-image:
+    name: build images and push
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: checkout
+        uses: actions/checkout@v1
+
+      - name: prepare buildx
+        id: buildx
+        uses: crazy-max/ghaction-docker-buildx@v1
+        with:
+          buildx-version: v0.3.1
+
+      - name: get the version
+        id: container
+        uses: qmx/ghaction-container-tag@master
+        with:
+          dockerhub_namespace: "${{ secrets.DOCKERHUB_NAMESPACE }}"
+
+      - uses: actions/download-artifact@v2
+        with:
+          name: "${{ steps.container.outputs.image }}:latest-amd64.tar.gz"
+
+      - uses: actions/download-artifact@v2
+        with:
+          name: "${{ steps.container.outputs.image }}:latest-armv7.tar.gz"
+
+      - name: load images
+        run: docker load "${{ steps.container.outputs.image }}:latest-amd64.tar.gz"
+
+      - name: load images
+        run: docker load "${{ steps.container.outputs.image }}:latest-armv7.tar.gz"
+
+      - name: login to docker hub
+        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+
+      - name: assemble image
+        run: docker buildx imagetools create -t "${{ steps.container.outputs.image }}:latest" "${{ steps.container.outputs.image }}:latest-amd64" "${{ steps.container.outputs.image }}:latest-armv7"
