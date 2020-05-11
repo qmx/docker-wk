@@ -1,26 +1,12 @@
 ARG SSH_HOST_KEYS_HASH=sha256:9a6630c2fbed11a3f806c5a5c1fe1550b628311d8701680fd740cae94b377e6c
 
-FROM qmxme/base-tools:0.0.2 as base_tools_builder
+FROM qmxme/base-tools:0.0.2-47-gbd7cfe7 as base_tools_builder
 
 # golang tools
 FROM qmxme/golang-tools:1.0.1 as golang_builder
 
 # rust-analyzer
 FROM qmxme/rust-analyzer:1.2.0 as ra_builder
-
-# rust tools
-FROM qmxme/rust-tools:1.2.1 as rust_tools_builder
-
-# rust web tools
-FROM qmxme/rust-web-tools:1.0.0 as rust_web_builder
-
-# rust extra tools
-FROM qmxme/rust-extra-tools:0.1.0 as rust_extra_builder
-
-# some individually compiled tools
-FROM qmxme/cargo-docserver:v0.2.0 as tool_cargo-docserver
-FROM qmxme/cpubars:v0.3.2 as  tool_cpubars
-FROM qmxme/wk-cli:v0.4.1 as tool_wk-cli
 
 # install terraform
 FROM qmxme/curl as terraform_builder
@@ -54,21 +40,13 @@ FROM qmxme/openssh@$SSH_HOST_KEYS_HASH as ssh_host_keys
 FROM qmxme/base:0.2.0
 
 # base tools
-COPY --from=base_tools_builder /usr/local/bin/* /usr/local/bin/
+COPY --from=base_tools_builder /opt/rust-tools/bin/* /usr/local/bin/
 
 # golang tools
 COPY --from=golang_builder /usr/local/bin/* /usr/local/bin/
 
 # rust essential crates
 COPY --from=ra_builder /opt/rust-tools/bin/* /usr/local/bin/
-COPY --from=rust_tools_builder /usr/local/bin/* /usr/local/bin/
-COPY --from=rust_web_builder /usr/local/bin/* /usr/local/bin/
-COPY --from=rust_extra_builder /usr/local/bin/* /usr/local/bin/
-
-# some individually compiled tools
-COPY --from=tool_cpubars /opt/rust-tools/bin/* /usr/local/bin/
-COPY --from=tool_cargo-docserver /opt/rust-tools/bin/* /usr/local/bin/
-COPY --from=tool_wk-cli /opt/rust-tools/bin/* /usr/local/bin/
 
 # terraform
 COPY --from=terraform_builder /usr/local/bin/terraform /usr/local/bin/
