@@ -55,6 +55,7 @@ jobs:
   assemble-image:
     name: build images and push
     runs-on: ubuntu-latest
+    needs: ["build"]
 
     steps:
       - name: checkout
