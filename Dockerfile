@@ -6,7 +6,7 @@ FROM qmxme/base-tools:0.0.2-47-gbd7cfe7 as base_tools_builder
 FROM qmxme/golang-tools:1.0.1 as golang_builder
 
 # rust-analyzer
-FROM qmxme/rust-analyzer:1.2.0 as ra_builder
+FROM qmxme/rust-analyzer:1.3.0 as ra_builder
 
 # install terraform
 FROM qmxme/curl as terraform_builder
