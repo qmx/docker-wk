@@ -1,6 +1,6 @@
 ARG SSH_HOST_KEYS_HASH=sha256:9a6630c2fbed11a3f806c5a5c1fe1550b628311d8701680fd740cae94b377e6c
 
-FROM qmxme/base-tools:0.0.2-47-gbd7cfe7 as base_tools_builder
+FROM qmxme/base-tools:0.1.0-1-g474752d as base_tools_builder
 
 # golang tools
 FROM qmxme/golang-tools:1.0.1 as golang_builder
