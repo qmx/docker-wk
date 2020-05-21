@@ -75,7 +75,7 @@ RUN mkdir -p ~/bin ~/.cargo/bin ~/.config ~/tmp ~/.gnupg ~/.local ~/.vim && chmo
 RUN coursier bootstrap  --java-opt -Xss4m --java-opt -Xms100m --java-opt -Dmetals.client=coc.nvim org.scalameta:metals_2.12:0.7.6 -r bintray:scalacenter/releases -o ~/bin/metals-vim -f
 
 # dotfile setup
-RUN git clone -b 1.5.6 --recursive https://github.com/qmx/dotfiles.git ~/.dotfiles
+RUN git clone -b 1.5.9 --recursive https://github.com/qmx/dotfiles.git ~/.dotfiles
 RUN cd ~/.dotfiles && stow -v .
 RUN mkdir -p ~/.config/coc
 RUN vim -c 'CocInstall -sync coc-css coc-emmet coc-git coc-html coc-json coc-prettier coc-rust-analyzer coc-tsserver coc-solargraph|q'
@@ -83,6 +83,12 @@ RUN vim -c 'CocInstall -sync coc-css coc-emmet coc-git coc-html coc-json coc-pre
 # install rust
 RUN curl -sSf https://sh.rustup.rs | zsh -s -- -y --default-toolchain 1.42.0
 RUN . /home/$user/.cargo/env && rustup component add rustfmt rust-src
+
+# install asdf-ruby
+RUN ["/bin/zsh", "-c", ". /home/$user/.asdf/asdf.sh && asdf plugin-add ruby https://github.com/asdf-vm/asdf-ruby.git"]
+
+# install ruby
+RUN ["/bin/zsh", "-c", ". /home/$user/.asdf/asdf.sh && asdf install ruby 2.7.1"]
 
 # make sure we start sshd at the end - always keep this at the bottom
 USER root
