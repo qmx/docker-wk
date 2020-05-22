@@ -78,7 +78,7 @@ RUN coursier bootstrap  --java-opt -Xss4m --java-opt -Xms100m --java-opt -Dmetal
 RUN git clone -b 1.5.9 --recursive https://github.com/qmx/dotfiles.git ~/.dotfiles
 RUN cd ~/.dotfiles && stow -v .
 RUN mkdir -p ~/.config/coc
-RUN vim -c 'CocInstall -sync coc-css coc-emmet coc-git coc-html coc-json coc-prettier coc-rust-analyzer coc-tsserver coc-solargraph|q'
+RUN sh -c 'for i in coc-css coc-emmet coc-git coc-html coc-json coc-prettier coc-rust-analyzer coc-tsserver coc-solargraph; do vim -c "CocInstall -sync $i|q";done'
 
 # install rust
 RUN curl -sSf https://sh.rustup.rs | zsh -s -- -y --default-toolchain 1.42.0
