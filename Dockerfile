@@ -61,7 +61,7 @@ COPY --from=helm_builder /usr/local/bin/helm /usr/local/bin/
 COPY --from=coursier_builder /usr/local/bin/coursier /usr/local/bin/
 
 # install heroku cli
-RUN curl https://cli-assets.heroku.com/install-ubuntu.sh | sh
+RUN npm install -g heroku
 
 # user setup
 ARG user=qmx
