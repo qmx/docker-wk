@@ -78,7 +78,7 @@ RUN mkdir -p ~/bin ~/.cargo/bin ~/.config ~/tmp ~/.gnupg ~/.local ~/.vim && chmo
 RUN coursier bootstrap  --java-opt -Xss4m --java-opt -Xms100m --java-opt -Dmetals.client=coc.nvim org.scalameta:metals_2.12:0.7.6 -r bintray:scalacenter/releases -o ~/bin/metals-vim -f
 
 # dotfile setup
-RUN git clone -b 1.5.10 --recursive https://github.com/qmx/dotfiles.git ~/.dotfiles
+RUN git clone -b 1.5.11 --recursive https://github.com/qmx/dotfiles.git ~/.dotfiles
 RUN cd ~/.dotfiles && stow -v .
 RUN mkdir -p ~/.config/coc
 RUN sh -c 'for i in coc-css coc-emmet coc-git coc-html coc-json coc-prettier coc-rust-analyzer coc-tsserver coc-solargraph; do vim -c "CocInstall -sync $i|q";done'
