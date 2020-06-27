@@ -11,7 +11,7 @@ FROM qmxme/rust-analyzer:1.3.0 as ra_builder
 # install terraform
 FROM qmxme/curl as terraform_builder
 ARG TARGETARCH
-RUN curl -L -o /tmp/terraform.zip https://releases.hashicorp.com/terraform/0.12.24/terraform_0.12.24_linux_$TARGETARCH.zip
+RUN curl -L -o /tmp/terraform.zip https://releases.hashicorp.com/terraform/0.12.26/terraform_0.12.26_linux_$TARGETARCH.zip
 RUN cd /usr/local/bin && unzip /tmp/terraform.zip && chmod 755 /usr/local/bin/terraform
 
 # install kubectl
