@@ -28,11 +28,6 @@ WORKDIR /tmp
 RUN tar -zxvf helm.tar.gz
 RUN cp linux-$TARGETARCH/helm /usr/local/bin
 
-# install coursier
-FROM qmxme/curl as coursier_builder
-RUN curl -L -o /usr/local/bin/coursier https://github.com/coursier/coursier/releases/download/v2.0.0-RC5-2/coursier
-RUN chmod 755 /usr/local/bin/coursier
-
 # SSH host keys
 FROM qmxme/openssh@$SSH_HOST_KEYS_HASH as ssh_host_keys
 
@@ -57,9 +52,6 @@ COPY --from=kubectl_builder /usr/local/bin/kubectl /usr/local/bin/
 # helm
 COPY --from=helm_builder /usr/local/bin/helm /usr/local/bin/
 
-# coursier
-COPY --from=coursier_builder /usr/local/bin/coursier /usr/local/bin/
-
 # install heroku cli
 RUN npm install -g heroku
 
@@ -73,9 +65,6 @@ RUN mkdir ~/.ssh && curl -fsL https://github.com/$github_user.keys > ~/.ssh/auth
 
 # some empty folders, with proper permissions
 RUN mkdir -p ~/bin ~/.cargo/bin ~/.config ~/tmp ~/.gnupg ~/.local ~/.vim && chmod 700 ~/.gnupg
-
-# install metals-vim
-RUN coursier bootstrap  --java-opt -Xss4m --java-opt -Xms100m --java-opt -Dmetals.client=coc.nvim org.scalameta:metals_2.12:0.7.6 -r bintray:scalacenter/releases -o ~/bin/metals-vim -f
 
 # dotfile setup
 RUN git clone -b 1.5.11 --recursive https://github.com/qmx/dotfiles.git ~/.dotfiles
