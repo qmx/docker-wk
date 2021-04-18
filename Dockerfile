@@ -1,86 +1,59 @@
 ARG SSH_HOST_KEYS_HASH=sha256:9a6630c2fbed11a3f806c5a5c1fe1550b628311d8701680fd740cae94b377e6c
-
-FROM qmxme/base-tools:0.1.0-1-g474752d as base_tools_builder
-
-# golang tools
-FROM qmxme/golang-tools:1.0.1 as golang_builder
-
-# rust-analyzer
-FROM qmxme/rust-analyzer:1.3.0 as ra_builder
-
-# install terraform
-FROM qmxme/curl as terraform_builder
-ARG TARGETARCH
-RUN curl -L -o /tmp/terraform.zip https://releases.hashicorp.com/terraform/0.12.28/terraform_0.12.28_linux_$TARGETARCH.zip
-RUN cd /usr/local/bin && unzip /tmp/terraform.zip && chmod 755 /usr/local/bin/terraform
-
-# install kubectl
-FROM qmxme/curl as kubectl_builder
-ARG TARGETARCH
-RUN curl -L -o /usr/local/bin/kubectl https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/$TARGETARCH/kubectl
-RUN chmod 755 /usr/local/bin/kubectl
-
-# install helm
-FROM qmxme/curl as helm_builder
-ARG TARGETARCH
-RUN curl -L -o /tmp/helm.tar.gz https://get.helm.sh/helm-v3.0.0-linux-$TARGETARCH.tar.gz
-WORKDIR /tmp
-RUN tar -zxvf helm.tar.gz
-RUN cp linux-$TARGETARCH/helm /usr/local/bin
-
-# SSH host keys
 FROM qmxme/openssh@$SSH_HOST_KEYS_HASH as ssh_host_keys
 
 # base distro
-FROM qmxme/base:0.2.0
+FROM debian:sid
 
-# base tools
-COPY --from=base_tools_builder /opt/rust-tools/bin/* /usr/local/bin/
+# setup env
+ENV DEBIAN_FRONTEND noninteractive
+ENV TERM linux
 
-# golang tools
-COPY --from=golang_builder /usr/local/bin/* /usr/local/bin/
+ENV LANGUAGE en_US.UTF-8
+ENV LANG en_US.UTF-8
+ENV LC_ALL en_US.UTF-8
+ENV LC_CTYPE en_US.UTF-8
+ENV LC_MESSAGES en_US.UTF-8
 
-# rust essential crates
-COPY --from=ra_builder /opt/rust-tools/bin/* /usr/local/bin/
+# default package set
+RUN apt-get update -qq && apt-get upgrade -y && apt-get install -y \
+	ca-certificates \
+	curl \
+	git \
+	locales \
+	openssh-server \
+	sudo \
+	xz-utils \
+	zsh \
+	--no-install-recommends \
+	&& rm -rf /var/lib/apt/lists/*
 
-# terraform
-COPY --from=terraform_builder /usr/local/bin/terraform /usr/local/bin/
+RUN echo "en_US.UTF-8 UTF-8" > /etc/locale.gen && \
+	locale-gen --purge $LANG && \
+	dpkg-reconfigure --frontend=noninteractive locales && \
+	update-locale LANG=$LANG LC_ALL=$LC_ALL LANGUAGE=$LANGUAGE
+RUN update-ca-certificates -f
 
-# kubectl
-COPY --from=kubectl_builder /usr/local/bin/kubectl /usr/local/bin/
-
-# helm
-COPY --from=helm_builder /usr/local/bin/helm /usr/local/bin/
-
-# install heroku cli
-RUN npm install -g heroku
+# sshd setup
+RUN mkdir /var/run/sshd
+RUN sed 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so@g' -i /etc/pam.d/sshd
+RUN sed 's/#Port 22/Port 3222/' -i /etc/ssh/sshd_config
+RUN echo 'StreamLocalBindUnlink yes' >> /etc/ssh/sshd_config
+COPY --from=ssh_host_keys /etc/ssh/ssh_host* /etc/ssh/
 
 # user setup
 ARG user=qmx
 ARG uid=1000
 ARG github_user=qmx
-RUN useradd -m $user -u $uid -G users,sudo,docker -s /bin/zsh
+RUN useradd -m $user -u $uid -G users,sudo -s /bin/zsh
+RUN mkdir -m 0755 /nix && chown $user /nix
 USER $user
+ENV USER=$user
 RUN mkdir ~/.ssh && curl -fsL https://github.com/$github_user.keys > ~/.ssh/authorized_keys && chmod 700 ~/.ssh && chmod 600 ~/.ssh/authorized_keys
 
-# some empty folders, with proper permissions
-RUN mkdir -p ~/bin ~/.cargo/bin ~/.config ~/tmp ~/.gnupg ~/.local ~/.vim && chmod 700 ~/.gnupg
-
 # dotfile setup
-RUN git clone -b 1.5.11 --recursive https://github.com/qmx/dotfiles.git ~/.dotfiles
-RUN cd ~/.dotfiles && stow -v .
-RUN mkdir -p ~/.config/coc
-RUN sh -c 'for i in coc-css coc-emmet coc-git coc-html coc-json coc-prettier coc-rust-analyzer coc-tsserver coc-solargraph; do vim -c "CocInstall -sync $i|q";done'
-
-# install rust
-RUN curl -sSf https://sh.rustup.rs | zsh -s -- -y --default-toolchain 1.42.0
-RUN . /home/$user/.cargo/env && rustup component add rustfmt rust-src
-
-# install asdf-ruby
-RUN ["/bin/zsh", "-c", ". /home/$user/.asdf/asdf.sh && asdf plugin-add ruby https://github.com/asdf-vm/asdf-ruby.git"]
-
-# install ruby
-RUN ["/bin/zsh", "-c", ". /home/$user/.asdf/asdf.sh && asdf install ruby 2.7.1"]
+RUN git clone https://github.com/qmx/dotfiles.git ~/.dotfiles # foo
+RUN cd ~/.dotfiles && ./bootstrap.sh
+RUN cd ~/.dotfiles && PATH=/home/$user/.nix-profile/bin:$PATH; ./switch.sh
 
 # make sure we start sshd at the end - always keep this at the bottom
 USER root
